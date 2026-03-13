@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Invitation - Jodhpur (RJwarrior Special)</title>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; background: #fce4ec; /* Backgound Color */
+            font-family: 'Arial', sans-serif; overflow: hidden; position: relative;
+        }
+
+        /* Open Button */
+        #openBtn {
+            padding: 18px 45px; font-size: 22px; font-weight: bold;
+            background: linear-gradient(45deg, #d81b60, #ff4081); color: white;
+            border: none; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(216, 27, 96, 0.4); z-index: 100;
+        }
+
+        /* Canvas Animation Styling */
+        #fireworksCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 5; display: none; pointer-events: none;
+        }
+
+        /* Wedding Card Frame (at the very top) */
+        #cardContainer {
+            display: none; position: absolute;
+            top: 0;           /* Top-most alignment */
+            left: 50%; transform: translateX(-50%);
+            width: 95%; max-width: 450px; height: 75vh;
+            text-align: center; z-index: 10;
+        }
+
+        /* Wedding Video or Image */
+        #weddingVideo {
+            width: 100%; height: 100%; object-fit: contain;
+            background: #fff; border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transform: scale(0); opacity: 0;
+            transition: all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .show-card #weddingVideo { transform: scale(1); opacity: 1; }
+        .shubh-vivah { color: #ad1457; font-weight: bold; font-size: 2rem; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <canvas id="fireworksCanvas"></canvas>
+
+    <button id="openBtn" onclick="startCelebration()">पधारिये श्रीमान (ओपन करें)</button>
+
+    <div id="cardContainer">
+        <video id="weddingVideo" playsinline>
+            <source src="shaadi.mp4" type="video/mp4">
+        </video>
+        <div class="shubh-vivah">|| शुभ विवाह ||</div>
+    </div>
+
+    <script>
+        // Start fireworks animation on click
+        function startCelebration() {
+            document.getElementById('openBtn').style.display = 'none';
+            const cardVideo = document.getElementById('weddingVideo');
+            const container = document.getElementById('cardContainer');
+            const canvas = document.getElementById('fireworksCanvas');
+            const ctx = canvas.getcontext('2d');
+            canvas.style.display = 'block';
+
+            // Function to generate random colors for fireworks
+            function getRandomColor() {
+                const colors = ['#FFC0CB', '#FF69B4', '#FFD700', '#FFA500', '#00FFFF'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            // Function to create and animate a single firework
+            function createFirework(x, y) {
+                const particles = [];
+                for (let i = 0; i < 50; i++) {
+                    const particle = {
+                        x: x,
+                        y: y,
+                        vx: Math.random() * 4 - 2, // Random horizontal velocity
+                        vy: Math.random() * 4 - 2, // Random vertical velocity
+                        radius: Math.random() * 3 + 1,
+                        color: getRandomColor(),
+                        life: Math.random() * 50 + 50, // Particle lifespan
+                        alpha: 1 // Initial transparency
+                    };
+                    particles.push(particle);
+                }
+
+                function animate() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frames
+                    for (let i = 0; i < particles.length; i++) {
+                        const p = particles[i];
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.life--;
+                        p.alpha -= 0.01; // Fade out particles
+
+                        if (p.life > 0 && p.alpha > 0) {
+                            ctx.fillStyle = p.color;
+                            ctx.globalAlpha = p.alpha;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else {
+                            particles.splice(i, 1); // Remove expired particles
+                        }
+                    }
+
+                    if (particles.length > 0) {
+                        requestAnimationFrame(animate); // Repeat animation for current firework
+                    }
+                }
+
+                requestAnimationFrame(animate); // Initiate animation for current firework
+            }
+
+            // Function to generate random fireworks and handle resizing
+            function generateFireworks() {
+                createFirework(Math.random() * canvas.width, Math.random() * canvas.height);
+                setInterval(generateFireworks, 1000); // Create a new firework every second
+            }
+
+            // Start random fireworks generation
+            generateFireworks();
+
+            // Set canvas size on window load and resize
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            window.addEventListener('load', resizeCanvas);
+            window.addEventListener('resize', resizeCanvas);
+
+            // Display card and play video
+            container.style.display = 'block';
+            setTimeout(() => {
+                container.classList.add('show-card');
+                cardVideo.muted = false; // Audio enabled for the card video
+                cardVideo.play();
+            }, 100);
+        }
+    </script>
+</body>
+</html>
